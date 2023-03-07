@@ -82,7 +82,7 @@ public class MainActivity extends Activity implements LocationListener {
     public void onResume() {
         super.onResume();
         firstTime = 0;
-        mMyLocationOverlay.enableMyLocation();
+        //mMyLocationOverlay.enableMyLocation();
     }
 
     // Idee für die Logik der for loop wurde aus chatGPT übernommen.
@@ -133,6 +133,5 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public void onLocationChanged(@NonNull Location location) {
         calculateDistance(location);
-
     }
 }
