@@ -9,10 +9,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/distance"
+            android:layout_width="384dp"
+            android:layout_height="62dp"
+            android:layout_weight="1"
+            android:text="TextView" />
+
         <org.osmdroid.views.MapView
             android:id="@+id/mapview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="383dp"
+            android:layout_height="568dp"
+            android:padding="10dp"
+            android:paddingLeft="10dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
