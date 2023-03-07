@@ -24,6 +24,8 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import android.location.Location;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity implements LocationListener {
     private MapView mMapView;
     private MyLocationNewOverlay mMyLocationOverlay;
@@ -71,11 +73,6 @@ public class MainActivity extends Activity implements LocationListener {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
             mMyLocationOverlay = new MyLocationNewOverlay(mMapView);
             mMapView.getOverlays().add(mMyLocationOverlay);
-            GeoPoint sightseeing = new GeoPoint(47.3770818,8.5399872);
-            Marker sightseeingMarker = new Marker(mMapView);
-            sightseeingMarker.setPosition(sightseeing);
-            sightseeingMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            mMapView.getOverlays().add(sightseeingMarker);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
         }
@@ -88,14 +85,43 @@ public class MainActivity extends Activity implements LocationListener {
         mMyLocationOverlay.enableMyLocation();
     }
 
+    // Idee für die Logik der for loop wurde aus chatGPT übernommen.
     public void calculateDistance(Location location) {
-        locationB.setLatitude(47.3770818);
-        locationB.setLongitude(8.5399872);
+        ArrayList<SightseeingLocation> sightseeingLocations = new ArrayList<>();
+        sightseeingLocations.add(new SightseeingLocation(8.5399872, 47.3770818, "Alfred Escher Denkmal"));
+        sightseeingLocations.add(new SightseeingLocation(8.6286014, 47.2491651, "Halbinsel AU"));
+        sightseeingLocations.add(new SightseeingLocation(10.5420327, 47.3795071, "Test 2"));
+        double minDistance = Double.MAX_VALUE;
+        SightseeingLocation closestSightseeingLocation = null;
+
+        Location locationA = new Location("pointA");
         locationA.setLatitude(location.getLatitude());
         locationA.setLongitude(location.getLongitude());
-        float distanceToLocation = locationA.distanceTo(locationB);
+
+        for (SightseeingLocation sightseeingLocation : sightseeingLocations) {
+            Location locationB = new Location("pointB");
+            locationB.setLatitude(sightseeingLocation.getLatitude());
+            locationB.setLongitude(sightseeingLocation.getLongitude());
+
+            float[] results = new float[1];
+            Location.distanceBetween(locationA.getLatitude(), locationA.getLongitude(),
+                    locationB.getLatitude(), locationB.getLongitude(), results);
+            double distance = results[0];
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestSightseeingLocation = sightseeingLocation;
+            }
+        }
+
         final TextView distance = (TextView) findViewById(R.id.distance);
-        distance.setText(Float.toString(distanceToLocation));
+        distance.setText(Double.toString(minDistance));
+        GeoPoint sightseeing = new GeoPoint(closestSightseeingLocation.getLatitude(),closestSightseeingLocation.getLongitude());
+        Marker sightseeingMarker = new Marker(mMapView);
+        sightseeingMarker.setPosition(sightseeing);
+        sightseeingMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        sightseeingMarker.setTitle(closestSightseeingLocation.getName());
+        mMapView.getOverlays().add(sightseeingMarker);
     }
 
     @Override
@@ -107,5 +133,6 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public void onLocationChanged(@NonNull Location location) {
         calculateDistance(location);
+
     }
 }
