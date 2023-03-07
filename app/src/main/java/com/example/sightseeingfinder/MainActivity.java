@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,10 +22,12 @@ import org.osmdroid.util.Distance;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import android.location.Location;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity implements LocationListener {
     private MapView mMapView;
@@ -34,7 +37,7 @@ public class MainActivity extends Activity implements LocationListener {
     private double longitude;
     private double latitude;
 
-    private int firstTime = 0;
+    private int count = 0;
 
     Location locationA = new Location("pointA");
     Location locationB = new Location("pointB");
@@ -61,7 +64,8 @@ public class MainActivity extends Activity implements LocationListener {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (lastKnownLocation != null) {
                 double lat = lastKnownLocation.getLatitude();
                 double lon = lastKnownLocation.getLongitude();
@@ -70,7 +74,7 @@ public class MainActivity extends Activity implements LocationListener {
                 mapController.setZoom(15.0);
                 mapController.setCenter(startPoint);
             }
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 5, this);
             mMyLocationOverlay = new MyLocationNewOverlay(mMapView);
             mMapView.getOverlays().add(mMyLocationOverlay);
         } else {
@@ -81,8 +85,7 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public void onResume() {
         super.onResume();
-        firstTime = 0;
-        //mMyLocationOverlay.enableMyLocation();
+        mMyLocationOverlay.enableMyLocation();
     }
 
     // Idee für die Logik der for loop wurde aus chatGPT übernommen.
@@ -122,6 +125,14 @@ public class MainActivity extends Activity implements LocationListener {
         sightseeingMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         sightseeingMarker.setTitle(closestSightseeingLocation.getName());
         mMapView.getOverlays().add(sightseeingMarker);
+        List<GeoPoint> points = new ArrayList<>();
+        points.add(sightseeing);
+        points.add(new GeoPoint(location.getLatitude(),location.getLongitude()));
+        Polyline line = new Polyline();
+        line.setPoints(points);
+        line.setColor(Color.RED);
+        line.setWidth(5f);
+        mMapView.getOverlayManager().add(line);
     }
 
     @Override
@@ -132,6 +143,11 @@ public class MainActivity extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
+        count++;
+        GeoPoint currentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+        IMapController mapController = mMapView.getController();
+        mapController.setZoom(15.0);
+        mapController.setCenter(currentLocation);
         calculateDistance(location);
     }
 }
