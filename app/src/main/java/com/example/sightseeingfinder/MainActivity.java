@@ -23,6 +23,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.Distance;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
@@ -84,6 +85,7 @@ public class MainActivity extends Activity implements LocationListener {
                 IMapController mapController = mMapView.getController();
                 mapController.setZoom(15.0);
                 mapController.setCenter(startPoint);
+                mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
             }
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 5, this);
             mMyLocationOverlay = new MyLocationNewOverlay(mMapView);
@@ -96,7 +98,13 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public void onResume() {
         super.onResume();
-        mMyLocationOverlay.enableMyLocation();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMyLocationOverlay.enableMyLocation();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+        }
+
+
     }
 
     // Idee für die Logik der for loop wurde aus chatGPT übernommen.

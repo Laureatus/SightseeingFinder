@@ -10,5 +10,33 @@
         android:id="@+id/degrees"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test" />
+        android:text="Loading..."
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/ll3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/ll3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center"
+        >
+
+        <Button
+            android:id="@+id/mapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Map" />
+
+        <Button
+            android:id="@+id/compassButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Compass" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
