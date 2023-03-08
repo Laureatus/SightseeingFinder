@@ -53,6 +53,7 @@ public class MainActivity extends Activity implements LocationListener {
         // Setze das Layout und die MapView
         setContentView(R.layout.activity_main);
         mMapView = findViewById(R.id.mapview);
+        mMyLocationOverlay = new MyLocationNewOverlay(mMapView);
 
         final TextView distance = (TextView) findViewById(R.id.distance);
         final Button compassButton = (Button) findViewById(R.id.compassButton);
@@ -84,7 +85,6 @@ public class MainActivity extends Activity implements LocationListener {
                 mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
             }
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 5, this);
-            mMyLocationOverlay = new MyLocationNewOverlay(mMapView);
             mMapView.getOverlays().add(mMyLocationOverlay);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
@@ -170,7 +170,12 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public void onPause() {
         super.onPause();
-        mMyLocationOverlay.disableMyLocation();
+        super.onResume();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMyLocationOverlay.disableMyLocation();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+        }
     }
 
     @Override
